@@ -1,0 +1,167 @@
+{
+  "name": "n8n Flow: Test Case Generator from JIRA Ticket",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -432,
+        -32
+      ],
+      "id": "ef827bb0-cd5f-4667-a280-1bbde391d109",
+      "name": "When chat message received",
+      "webhookId": "2c9c8f48-b56d-4106-a98c-d2d60b51a42c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2d807f92-a0a1-4e19-9fad-b5950b84532f",
+              "name": "requirementText",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "6af4eff8-413c-490e-b146-06d0b78d17d0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.requirementText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a helpfulROLE: You are a Senior QA Engineer responsible for writing functional test cases.\n\nINPUT: A software requirement or JIRA ticket description.\n\nCONSTRAINTS:\n- Use ONLY the information provided in the requirement\n- Mark anything unclear as \"Needs clarification\"\n- No assumptions beyond what is stated\n\nOUTPUT: A markdown table with these exact columns:\n| TC ID | Test Case Title | Preconditions | Test Steps | Expected Result | Priority |\n\nPROCESS:\n1. Read the requirement carefully\n2. Identify: actors, actions, conditions, limits, error states\n3. Cover: valid flows, invalid inputs, boundary values, security edge cases\n4. Assign Priority: P1 (Critical), P2 (High), P3 (Medium)\n\nTONE: Technical, concise, unambiguous assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "6bbc070b-21dc-4d0b-9cab-0b73296040af",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        176
+      ],
+      "id": "2a6ec66d-4e5f-4336-9969-6bee6fa4c61c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LiAgQmTQK35fN9Lq",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a747df6d-b2b5-41d0-84fc-9633e5d5f047",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        112
+      ],
+      "id": "65da0ef7-36df-48e0-8cb5-2df202b6399c",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6f78d84f-40a8-41d8-a1e1-ec9eb03f10f5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "358b7e4743c34ef90004d57a4c61a5bb601fa5919d6a32d2ea73657a24559e45"
+  },
+  "id": "whaEB6z2wAuDHHPQ",
+  "tags": []
+}
