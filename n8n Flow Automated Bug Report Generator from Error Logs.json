@@ -1,0 +1,151 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        -112
+      ],
+      "id": "1d7aa797-a059-40f1-8b55-16ca0a220012",
+      "name": "When chat message received",
+      "webhookId": "aecf27a2-7a53-4734-9092-7ab4417abc89"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e19d23f4-7b61-4841-89e3-eba453263758",
+              "name": "error_log",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -112
+      ],
+      "id": "1dc2b7fd-efb5-4500-b969-60dacf74da89",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a Senior QA Engineer.\n\nYour task is to generate a structured bug report using ONLY the provided log data.\n\nSTRICT RULES:\n- Use ONLY the log data given.\n- DO NOT assume or invent missing details.\n- If any information is missing, write [UNKNOWN].\n- Do NOT hallucinate.\n- Output must be in ONE SINGLE LINE.\n- Separate each field using \" | \"\n\nOutput Format (strictly follow):\n\nTitle: \"<short clear bug title>\" | Severity: <Low | Medium | High | Critical> | Steps: <concise reproduction step> | Expected: <expected behavior> | Actual: <actual behavior from log>",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        256,
+        -112
+      ],
+      "id": "cd9e8d3d-6584-487c-aaa7-4a9bbb2f8687",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        608,
+        -112
+      ],
+      "id": "717b87bd-4c72-45ea-a2d2-9615edfc72e3",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        112,
+        96
+      ],
+      "id": "842247c8-0f38-44a9-b1d7-4cfcb55c53da",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LiAgQmTQK35fN9Lq",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e3ebe890-3bf5-4626-bf7f-d5cb8cfdf35c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "358b7e4743c34ef90004d57a4c61a5bb601fa5919d6a32d2ea73657a24559e45"
+  },
+  "id": "pZxTsHXZ1Q09FLNQ",
+  "tags": []
+}
